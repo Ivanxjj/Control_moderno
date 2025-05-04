@@ -1,0 +1,62 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.integrate import solve_ivp
+
+# === Parámetros del circuito ===
+R = 100
+L = 0.1
+Cap = 1e-6
+
+# === Matrices del sistema con 2 salidas ===
+A = np.array([[-R / L, -1 / (L * Cap)],
+              [1,        0]])
+B = np.array([[1 / L],
+              [0]])
+C = np.array([[1,     0],
+              [0, 1 / Cap]])  # 2 salidas
+D = np.array([[0],
+              [0]])
+
+# === Simulación ===
+ts = 0.015
+tspan = (0, ts)
+u = 1  # Entrada escalón
+x0 = np.array([0, 0])  # Condición inicial
+
+# === Función del modelo ===
+def modelRLC(t, x):
+    x = x.reshape(-1, 1)  # Convertir a columna
+    dx = A @ x + B * u
+    return dx.flatten()
+
+# === Resolver la ecuación diferencial ===
+sol = solve_ivp(modelRLC, tspan, x0, dense_output=True)
+t = np.linspace(tspan[0], tspan[1], 300)
+X = sol.sol(t).T  # X es Nx2
+
+# === Cálculo de salidas ===
+Y = (C @ X.T + D * u).T  # Y es Nx2
+
+# === Gráficas ===
+plt.figure(figsize=(10, 6))
+
+plt.subplot(2, 2, 1)
+plt.plot(t, Y[:, 0])
+plt.title('Corriente en el circuito')
+plt.xlabel('Tiempo [s]')
+plt.ylabel('i [A]')
+
+plt.subplot(2, 2, 2)
+plt.plot(t, Y[:, 1])
+plt.title('Voltaje en el capacitor')
+plt.xlabel('Tiempo [s]')
+plt.ylabel('Vc [V]')
+
+plt.subplot(2, 2, (3, 4))
+plt.plot(X[:, 0], X[:, 1], marker='>')
+plt.title('Trayectoria en el espacio de estados')
+plt.xlabel('x1 = q')
+plt.ylabel('x2 = i')
+
+plt.tight_layout()
+plt.show()
