@@ -5,16 +5,16 @@ R = 100;           % Resistencia en ohmios
 L = 0.1;           % Inductancia en henrios
 Cap = 1e-6;        % Capacitancia en faradios
 
-% === Matrices del modelo en espacio de estados ===
+%  Matrices del modelo en espacio de estados 
 A = [-R/L, -1/(L*Cap); 1, 0];
 B = [1/L; 0];
 C = [1, 0; 0, 1/Cap];   % Salidas: voltaje del capacitor y corriente
 D = [0; 0];
 
-% === Crear sistema en espacio de estados ===
+%  Crear sistema en espacio de estados 
 sys = ss(A, B, C, D);
 
-% === Respuestas al escalón e impulso ===
+%  Respuestas al escalón e impulso 
 figure;
 subplot(2,1,1);
 step(sys);
@@ -26,7 +26,7 @@ impulse(sys);
 title('Respuesta al Impulso');
 xlabel('Tiempo [s]'); ylabel('Salida');
 
-% === Conversión a función de transferencia ===
+%  Conversión a función de transferencia 
 G = tf(sys);
 disp('Función de transferencia del sistema:');
 G
