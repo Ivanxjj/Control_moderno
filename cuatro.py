@@ -2,12 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
-# === Parámetros del circuito ===
+#  Parámetros del circuito 
 R = 100
 L = 0.1
 Cap = 1e-6
 
-# === Matrices del sistema con 2 salidas ===
+#  Matrices del sistema con 2 salidas 
 A = np.array([[-R / L, -1 / (L * Cap)],
               [1,        0]])
 B = np.array([[1 / L],
@@ -17,20 +17,20 @@ C = np.array([[1,     0],
 D = np.array([[0],
               [0]])
 
-# === Tiempo de simulación ===
+#  Tiempo de simulación 
 ts = 0.001
 t_final = 0.05
 tspan = np.arange(0, t_final + ts, ts)
 N = len(tspan)
 
-# === Inicialización ===
+#  Inicialización 
 x0 = np.array([0, 0])
 X = np.zeros((N, 2))      # Estados
 Y = np.zeros((N, 2))      # Salidas
 u_vec = np.zeros(N)       # Entrada
 X[0, :] = x0
 
-# === Función u(t): entrada arbitraria ===
+# Función u(t): entrada arbitraria 
 def entrada(t):
     if t < 0.0175:
         return 0
@@ -41,13 +41,13 @@ def entrada(t):
     else:
         return 10
 
-# === Modelo con entrada constante ===
+#  Modelo con entrada constante 
 def modelRLC_constante(t, x, uk):
     x = x.reshape(-1, 1)
     dx = A @ x + B * uk
     return dx.flatten()
 
-# === Bucle de simulación paso a paso ===
+#  Bucle de simulación paso a paso 
 for k in range(1, N):
     uk = entrada(tspan[k])
     u_vec[k] = uk
@@ -63,7 +63,7 @@ for k in range(1, N):
     # Calcular salida
     Y[k, :] = (C @ X[k, :].reshape(-1, 1) + D * uk).flatten()
 
-# === Gráficas ===
+#  Gráficas 
 plt.figure(figsize=(10, 6))
 
 plt.subplot(2, 2, 1)
@@ -84,12 +84,7 @@ plt.title('Voltaje en el capacitor')
 plt.xlabel('Tiempo [s]')
 plt.ylabel('Vc [V]')
 
-# Si quieres activar el espacio de estados, descomenta esto:
-# plt.subplot(2, 2, 4)
-# plt.plot(X[:, 0], X[:, 1], marker='>')
-# plt.title('Espacio de estados')
-# plt.xlabel('x1 = q')
-# plt.ylabel('x2 = i')
+
 
 plt.tight_layout()
 plt.show()
