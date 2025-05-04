@@ -2,12 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import control as ctrl
 
-# === Parámetros del circuito RLC serie ===
+#  Parámetros del circuito RLC serie 
 R = 100           # Resistencia en ohmios
 L = 0.1           # Inductancia en henrios
 Cap = 1e-6        # Capacitancia en faradios
 
-# === Matrices del modelo en espacio de estados ===
+# Matrices del modelo en espacio de estados 
 A = np.array([[-R/L, -1/(L*Cap)],
               [1,     0]])
 B = np.array([[1/L],
@@ -17,10 +17,10 @@ C = np.array([[1, 0],
 D = np.array([[0],
               [0]])
 
-# === Crear sistema en espacio de estados ===
+#  Crear sistema en espacio de estados 
 sys = ctrl.ss(A, B, C, D)
 
-# === Respuesta al escalón ===
+#  Respuesta al escalón 
 t1, y1 = ctrl.step_response(sys)
 
 # Asegurarse de que las dimensiones coincidan y extraer el voltaje
@@ -35,7 +35,7 @@ plt.xlabel('Tiempo [s]')
 plt.ylabel('Voltaje [V]')
 plt.legend()
 
-# === Respuesta al impulso ===
+#  Respuesta al impulso 
 t2, y2 = ctrl.impulse_response(sys)
 
 # Asegurarse de que las dimensiones coincidan y extraer el voltaje
@@ -52,10 +52,10 @@ plt.legend()
 plt.tight_layout()
 plt.show()
 
-# === Conversión a función de transferencia ===
+#  Conversión a función de transferencia 
 G = ctrl.ss2tf(sys)
 print("Función de transferencia del sistema:")
 print(G)
 
-# === Conversión de nuevo a espacio de estados ===
+#  Conversión de nuevo a espacio de estados 
 AA, BB, CC, DD = ctrl.tf2ss(G)
