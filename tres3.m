@@ -1,30 +1,30 @@
 clc; clear all; close all;
 
-% === Parámetros del circuito ===
+%  Parámetros del circuito 
 R = 100;
 L = 0.1;
 Cap = 1e-6;
 
-% === Matrices del sistema con 2 salidas ===
+%  Matrices del sistema con 2 salidas 
 A = [-R/L, -1/(L*Cap); 1, 0];
 B = [1/L; 0];
 C = [1, 0; 0, 1/Cap];
 D = [0; 0];
 
-% === Tiempo de simulación ===
+%  Tiempo de simulación 
 ts = 0.001;
 t_final = 0.05;
 tspan = 0:ts:t_final;
 N = length(tspan);
 
-% === Inicialización ===
+%  Inicialización 
 x0 = [0; 0];
 X = zeros(N, 2);     % Estados
 Y = zeros(N, 2);     % Salidas
 u_vec = zeros(N,1);  % Entradas
 X(1,:) = x0;
 
-% === Bucle de simulación paso a paso ===
+%  Bucle de simulación paso a paso 
 for k = 2:N
     % Valor de entrada constante en este paso
     uk = entrada(tspan(k));
@@ -39,7 +39,7 @@ for k = 2:N
     Y(k,:) = (C * X(k,:).' + D * uk).';  % Transponer para que quede como fila
 end
 
-% === Gráficas ===
+%  Gráficas 
 figure;
 
 subplot(2,2,1);
