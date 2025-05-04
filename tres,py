@@ -2,12 +2,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
-# === Parámetros del circuito ===
+# Parámetros del circuito 
 R = 100
 L = 0.1
 Cap = 1e-6
 
-# === Matrices del sistema con 2 salidas ===
+#  Matrices del sistema con 2 salidas 
 A = np.array([[-R / L, -1 / (L * Cap)],
               [1,        0]])
 B = np.array([[1 / L],
@@ -17,27 +17,27 @@ C = np.array([[1,     0],
 D = np.array([[0],
               [0]])
 
-# === Simulación ===
+#  Simulación 
 ts = 0.015
 tspan = (0, ts)
 u = 1  # Entrada escalón
 x0 = np.array([0, 0])  # Condición inicial
 
-# === Función del modelo ===
+#  Función del modelo 
 def modelRLC(t, x):
     x = x.reshape(-1, 1)  # Convertir a columna
     dx = A @ x + B * u
     return dx.flatten()
 
-# === Resolver la ecuación diferencial ===
+#  Resolver la ecuación diferencial 
 sol = solve_ivp(modelRLC, tspan, x0, dense_output=True)
 t = np.linspace(tspan[0], tspan[1], 300)
 X = sol.sol(t).T  # X es Nx2
 
-# === Cálculo de salidas ===
+#  Cálculo de salidas 
 Y = (C @ X.T + D * u).T  # Y es Nx2
 
-# === Gráficas ===
+#  Gráficas 
 plt.figure(figsize=(10, 6))
 
 plt.subplot(2, 2, 1)
