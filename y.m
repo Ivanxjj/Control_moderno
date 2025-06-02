@@ -16,7 +16,7 @@ G_open = series(G1, G2);  % o G1*G2
 % Sistema en lazo cerrado con realimentación negativa
 Gs = feedback(G_open, H1);  % T(s) = G_open / (1 + G_open*H1)
 
-% Mostrar la función de transferencia resultante
+
 disp('Función de transferencia en lazo cerrado:')
 Gs
 
@@ -34,8 +34,7 @@ zero(Gs)
 disp('Polinomio característico:')
 disp(den)
 
-% Crear la tabla de Routh-Hurwitz manualmente (opcional) o usar función externa
-% Alternativamente puedes usar la herramienta Control System Toolbox para análisis completo:
+
 isStable = isstable(Gs);
 disp(['¿El sistema es estable?: ', string(isStable)])
 %%
