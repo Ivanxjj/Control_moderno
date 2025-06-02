@@ -1,18 +1,27 @@
-clc;clear all;close all;
+clc,clear all,close all;
+num=1;
+den=[2 1];
+gs=tf(num,den);
+roots(den);
+pole(gs);
+%%
+wn=1;
+xi=1.2;%0 osilatorio,0.2 subamoprtiguado,1 crticament amortiguado.1.2sobre amoritguado
 
- %Parámetros del circuito
-R = 100; % Resistencia (ohmios)
-L = 0.1; % Inductancia (henrios)
-Cap = 1e-6; % Capacitancia (faradios)
-A = [0 1; -1/(L*Cap) -R/L]; % Matriz de Estado
-B = [0; 1/L]; % Matriz de Entrada
-C = [1/Cap 0]; % Matriz de Salida
-D = 0; % Matriz de Transferencia directa
+num=wn^2;
+den=[1 2*xi*wn wn^2];
+gs=tf(num,den);
 
-sys = ss(A,B,C,D);
-subplot(2,1,1);
-step(sys);
-xlabel('Time [s]'); ylabel('Vc [V]');
-subplot(2,1,2);
-impulse(sys);
-xlabel('Time [s]'); ylabel('Vc [V]');
+roots(den);
+pole(gs);
+
+[y,t]=step(gs,15);
+
+subplot(2,1,1)
+plot(t,y);
+grid on
+title("Sistema oscilatorio");
+subplot(2,1,2)
+pzmap(gs)
+
+%%
