@@ -1,69 +1,111 @@
-%Universida de Cuenca
-%Materia: Teoria de control meoderno
-%Taller 6: 
-%Autor: Ivan Javier Jara
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-clc;clear all;close all;
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%segundo orden
 clc;
 clear;
 close all;
 
-%% Parámetros del sistema RLC y PID
-R = 5;
-L = 0.1;
-Cap = 220e-6;
-Kp = 10;
-Ki = 1000;
-Kd = 0.01;
+% Opción 1: resolver por numerador y denominador
+num = [1 3];
+den = [1 5 20 16 0];
+G=tf(num,den);
+% Polos y ceros
+zs = roots(num);
+ps = roots(den);
 
-%% Variable simbólica
-s = tf('s');
+% Graficar los polos y ceros
+figure
+v = [-6 6 -6 6]; % Corrección aquí
+axis(v); 
+axis('square');
+hold on; grid on;
+plot(real(zs), imag(zs), 'bo', 'LineWidth', 2); % ceros: círculos azules
+plot(real(ps), imag(ps), 'rx', 'LineWidth', 2); % polos: cruces rojas
+title('Diagrama de Polos y Ceros');
+xlabel('Parte Real');
+ylabel('Parte Imaginaria');
+legend('Ceros', 'Polos');
+n = length(ps);
+m = length(zs);
+k = 0 : n - m - 1;
+tetha = (pi()*(2*k + 1) / (n - m));
+tethadeg = rad2deg(tetha);
+sigma0 = (sum(real(ps)) - sum(real(zs))) / (n - m);
+plot (sigma0,0,'gh');
 
-%% Modelo de la planta (RLC)
-num = 1 / (L * Cap);                     % Numerador
-den = [1, R/L, 1/(L*Cap)];               % Denominador
-G = tf(num, den);                        % Planta RLC
+x = 0;
+y1 = sqrt (3) * (x - sigma0);
+y2 = -y1;
+plot(0,y1,'kd')
+plot(0,y2,'kd')
 
-%% Controlador PID
-P = tf(Kp);
-I = tf(Ki/s);
-D = tf(Kd * s);
-PID = parallel(P, I);
-PID = parallel(PID, D);                 % PID total
 
-%% Sistema en lazo abierto y cerrado
-OpenLoop = series(PID, G);
-ClosedLoop = feedback(OpenLoop, 1);     % Retroalimentación unitaria negativa
+x = sigma0:0.1:6;
+y1 = sqrt (3) * (x- sigma0);
+y2 =-y1;
+xa =-6:0.1:sigma0;
+ya = zeros(1, length(xa));
+plot (x, y1, 'k-.');
+plot (x, y2, 'k-.');
+plot (xa, ya, 'k-.');
+fK = -1/G;
+[B, A]=tfdata(fK,'v');
 
-%% Mostrar función de transferencia en lazo cerrado
-disp('Función de transferencia en lazo cerrado:')
-ClosedLoop
 
-%% Análisis de estabilidad
-disp('Polos del sistema:')
-p = pole(ClosedLoop)
-disp('Ceros del sistema:')
-z = zero(ClosedLoop)
 
-%% Obtener polinomio característico
-[~, den_cl] = tfdata(ClosedLoop, 'v');
-disp('Polinomio característico:')
-disp(den_cl)
+[B, A] = tfdata(G, 'v');
+term1 = conv(B, polyder(A));
+term2 = conv(A, polyder(B));
+max_length = max(length(term1),length(term2));
+term1 = [zeros(1,max_length-length(term1)), term1];
+term2 = [zeros(1,max_length-length(term2)), term2];
+adyacentes = term1 - term2;
+psKs = roots(adyacentes);
+psKs = psKs(imag(psKs)==0);
+plot(real(psKs),imag(psKs),'ks');
 
-%% Estabilidad con Routh-Hurwitz
-isStable = isstable(ClosedLoop);
-disp(['¿El sistema es estable?: ', string(isStable)])
+jwint = roots([1 7 -1344]);
+jwpol = [(84 - jwint(2))/5 0 3*jwint(2)];
+jwints = roots(jwpol);
+plot(real(jwints),imag(jwints),'ks');
 
-%% Subplot: respuesta y mapa de polos y ceros
-figure;
-subplot(1,2,1)
-step(ClosedLoop)
-title('Respuesta al escalón')
-grid on
+pcc = ps(imag(ps)>0);
 
-subplot(1,2,2)
-pzmap(ClosedLoop)
-title('Mapa de polos y ceros')
-grid on
+angzs = zeros(1,length(zs));
+angps=zeros(1,length(ps)-1);
+j=1;
+for i=1:length(ps)
+    psi=ps(i);
+    x=real(pcc)-real(psi);
+    y=imag(pcc)-imag(psi);
+    if (x==0) && (y==0)
+        continue;
+    end
+    rel=y/x;
+    ang=rad2deg(atan(rel));
+    if ang <0
+        ang=ang+180;
+    end
+    angps(j)=ang;
+    j=j+1;
+end
+
+
+j=1;
+for i=1:length(zs)
+    zsi=zs(i);
+    x=real(pcc)-real(zsi);
+    y=imag(pcc)-imag(zsi);
+    if (x==0) && (y==0)
+        continue;
+    end
+    rel=y/x;
+    ang=rad2deg(atan(rel));
+    if ang <0
+        ang=ang+180;
+    end
+    angzs(j)=ang;
+    j=j+1;
+end
+
+tetha = 180 - sum(angps) + sum(angzs);
+
+r = rlocus(num,den);
+plot(r,'-')
